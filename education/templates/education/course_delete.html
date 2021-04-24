@@ -1,0 +1,16 @@
+{% extends 'education/base.html' %}
+
+{% block title %}
+	Видалити курс "{{course.name}}" - {{block.super}}
+{% endblock %}
+
+{% block detail %}
+	<form action="{% url 'course_delete_url' course.id %}" method="post" enctype="multipart/form-data">
+		{% csrf_token %}
+		<h2 class='alert alert-danger' id='course_delete'>
+			Ви впевнені, що бажаєте видалити курс "{{course.name}}"?
+		</h2>	
+		<a href="javascript:history.back()" class="btn btn-primary">назад</a>
+		<button type="submit" class="btn btn-danger">видалити</button>
+	</form>
+{% endblock %}

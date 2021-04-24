@@ -1,0 +1,41 @@
+{% extends 'education/base.html' %}
+
+{% block catalog %}
+	{% if page %}
+
+		{% for course in page %}
+			<div class="card text-black bg-light" style="max-width: 18rem;">
+				{% if course.image %}
+					<img class="card-img-top" src="{{course.image.url}}">
+				{% else %}
+					<img class="card-img-top" src="../../media/images/you_course.png">
+				{% endif %}
+
+				{% if user.is_authenticated %}
+					<div  class='card-header'>
+						<a href="{% url 'course_edit_url' course.id %}" class="alert alert-primary">редагувати</a>
+						<a href="{% url 'course_delete_url' course.id %}" class="alert alert-danger">видалити</a>
+					</div>
+				{% endif %}
+
+				<div class="card-body">
+					<h3><a href="{% url 'course_detail_url' course.id %}">{{course.name}}</a></h3>
+					<p class="card-text">{{course.annotation}}</p>
+				</div>
+				<div class="card-footer" id='lectures_amount'>
+					Кількіть лекцій - <b>{{course.lectures_number}}</b>
+				</div>
+				<div class="card-footer" id='start'>
+					Початок - {{course.start|date:"d.m H:i"}}
+				</div>
+			</div>
+		{% endfor %}
+
+	{% else %}
+		<h1 align="center">Курсів не знайдено</h1>
+	{% endif %}		
+{% endblock %}
+
+{% block pagination %}
+	{% include 'education/pagination.html' %}
+{% endblock %}

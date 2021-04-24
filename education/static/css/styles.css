@@ -1,0 +1,40 @@
+.card-img-top {
+	height: 225px;
+}
+
+#brand {
+	font-family: 'Zen Dots', cursive;
+}
+
+#brand a {
+	text-decoration: none;
+	color: white;
+}
+
+.nav-link {
+	color: white;
+}
+
+.card-body a {
+	text-decoration: none;
+	font-style: italic;
+}
+
+#lectures_amount {
+	border: none; 
+	background: none;
+}
+
+#course_info {
+	font-size: 14pt; 
+	font-weight: bold;
+}
+
+#start {
+	text-align: center;
+}
+
+#course_delete {
+	color: black;
+	font-weight: bold;
+}
