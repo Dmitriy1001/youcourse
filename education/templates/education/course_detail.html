@@ -5,7 +5,7 @@
 {% block detail %}
 	<h1 align="center">{{course.name}}</h1>
 	<p id='course_info'>
-		Початок курсу: {{course.start|date:"d.m H:i"}}<br>
+		Початок курсу: {{course.start|date:"d.m.Y H:i"}}<br>
 		Закінчення: {{course.end|date:"d.m"}}<br>
 		Кілікість лекцій: {{course.lectures_number}}
 	</p>

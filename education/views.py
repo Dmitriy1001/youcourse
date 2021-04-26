@@ -12,6 +12,19 @@ def courses_list(request):
 		courses = Course.objects.filter(Q(name__contains=search))
 	else:	
 		courses = Course.objects.all()
+	context = utils.pagination(request, utils.relevant_filter(courses), 6)
+	return render(request, 'education/courses_list.html', context)
+
+def courses_filter(request, month):
+	courses = [course for course in Course.objects.all()\
+			   if month in course.start.ctime()]
+	context = utils.pagination(request, utils.relevant_filter(courses), 6)
+	return render(request, 'education/courses_list.html', context)
+
+def courses_archive(request):
+	courses = Course.objects.all()
+	relevant_courses = utils.relevant_filter(courses)
+	courses = [course for course in courses if course not in relevant_courses]
 	context = utils.pagination(request, courses, 6)
 	return render(request, 'education/courses_list.html', context)
 
@@ -20,7 +33,6 @@ def course_detail(request, course_id):
 	course = get_object_or_404(Course, id=course_id)
 	return render(request, 'education/course_detail.html', {'course': course})
 
-
 @login_required
 def course_create(request):
 	return utils.create_edit_course(request, 'create')
@@ -28,7 +40,6 @@ def course_create(request):
 @login_required
 def course_edit(request, course_id):
 	return utils.create_edit_course(request, 'edit', course_id)
-
 
 @login_required
 def course_delete(request, course_id):

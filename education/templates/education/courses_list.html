@@ -1,6 +1,23 @@
 {% extends 'education/base.html' %}
 
+{% block detail %}
+	<div align="right" class="dropdown">
+		<button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+			Фільтр
+		</button>
+
+		<div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+			<a class="dropdown-item" href="{% url 'courses_list_url' %}">Всі</a>
+			{% for month in months %}
+				<a class="dropdown-item" href="{% url 'courses_filter_url' month.1 %}">{{month.0}}</a>
+			{% endfor %}
+			<a class="dropdown-item" href="{% url 'courses_archive_url' %}" id="archive">Архів</a>
+		</div>
+	</div>
+{% endblock %}
+
 {% block catalog %}
+	
 	{% if page %}
 
 		{% for course in page %}
@@ -26,11 +43,17 @@
 					Кількіть лекцій - <b>{{course.lectures_number}}</b>
 				</div>
 				<div class="card-footer" id='start'>
-					Початок - {{course.start|date:"d.m H:i"}}
+					{% if course.start == "Курс розпочався" %}
+						Курс вже розпочався
+					{% elif course.start == "Курс завершено" %}
+						Курс завершено
+					{% else %}	
+						Початок - {{course.start|date:"d.m H:i"}}
+					{% endif %}	
 				</div>
 			</div>
 		{% endfor %}
-
+		
 	{% else %}
 		<h1 align="center">Курсів не знайдено</h1>
 	{% endif %}		

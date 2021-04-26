@@ -1,7 +1,36 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.core.paginator import Paginator
+from django.utils import timezone
+import re
+
 from .models import Course
 from .forms import CourseCreateEditForm
+
+def relevant_filter(courses):
+	for course in courses:
+		if course.start < timezone.now() < course.end:
+			course.start = 'Курс розпочався'
+		elif timezone.now() > course.end:
+			course.start = 'Курс завершено'
+	courses = [course for course in courses if course.start != 'Курс завершено']		
+	return courses
+
+def months_list():
+	'''Only months with courses are listed'''
+	courses = relevant_filter(Course.objects.all())
+	d = {
+		"Dec": "Грудень", "Jan": "Січень", "Feb": "Лютий", 
+		"Mar": "Березень", "Apr": "Квітень", "May": "Травень", 
+		"Jun": "Червень", "Jul": "Липень", "Aug": "Серпень", 
+		"Sep": "Вересень", "Oct": "Жовтень", "Nov": "Листопад", 
+	}
+	months = []
+	for course in courses:
+		if not isinstance(course.start, str):
+			month = re.search(r'\w+\s+(\w+)\s+\w+', course.start.ctime()).group(1)
+			month = (d[month], month)
+			if month not in months: months.append(month)
+	return months
 
 def pagination(request, objs, objs_on_page):
 	paginator = Paginator(objs, objs_on_page)
@@ -19,24 +48,23 @@ def pagination(request, objs, objs_on_page):
 		next_url = ''
 
 	return {
+		'months': months_list(),
 		'page': page,
 		'is_paginated': is_paginated,
 		'prev_url': prev_url,
 		'next_url': next_url
 	}
 
-
 def what_page_on_paginator(request, objs_on_page, course_id):
-	courses = Course.objects.all()	
-	d = {}
-	page, count = 1, 0
-	for i in courses:
+	pages, page, count = {}, 1, 0
+	for course in Course.objects.all():
 		if count == objs_on_page:
 			page += 1; count = 0
-		d[i] = page; count += 1
+		pages[course] = page; count += 1
 	course = get_object_or_404(Course, id=course_id)
-	return d[course]
+	return pages[course]
 
+# mixins
 
 def create_edit_course(request, action='create', course_id=None):
 	if action == 'edit':

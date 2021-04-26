@@ -10,7 +10,7 @@ class Course(models.Model):
 	text = models.TextField(blank=True, verbose_name='Текст')
 	lectures_number = models.IntegerField(default=1, verbose_name='Кількість лекцій')
 	start = models.DateTimeField(verbose_name='Початок')
-	end = models.DateField(verbose_name='Завершення')
+	end = models.DateTimeField(verbose_name='Завершення')
 
 	class Meta:
 		verbose_name = 'Курс'
