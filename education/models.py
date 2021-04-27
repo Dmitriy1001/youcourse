@@ -24,6 +24,8 @@ class Course(models.Model):
 			self.annotation = lorem.sentence() * randint(1, 3)
 		if not self.text:
 			self.text = lorem.text() * randint(2, 5)
+		if not self.image:
+			self.image = '../media/images/you_course.png'	
 		super().save(*args, **kwargs)				
 
 	def __str__(self):
