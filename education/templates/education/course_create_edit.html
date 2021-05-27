@@ -3,7 +3,7 @@
 {% block title %}Додати/Редагувати курс - {{block.super}}{% endblock %}
 
 {% block detail %}
-	<form action="{% url 'course_create_url' %}" method='post' enctype="multipart/form-data">
+	<form  method='post' enctype="multipart/form-data">
 		{% csrf_token %}
 		{{form.media}}
 		
@@ -19,6 +19,7 @@
 			</div>
 		{% endfor %}
 
-		<button type="submit" class="btn btn-primary">додати/редагувати</button>
+		<button type="submit" class="btn btn-primary">зберегти</button>
 	</form>
+	{{ info }}
 {% endblock %}

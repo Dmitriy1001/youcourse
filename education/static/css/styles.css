@@ -43,3 +43,7 @@
 	color: grey;
 	font-size: 10pt;
 }
+
+.period_filter a {
+	text-decoration: none;
+}

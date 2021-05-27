@@ -16,8 +16,7 @@ def relevant_filter(courses):
 	return courses
 
 def months_list():
-	'''Only months with courses are listed'''
-	courses = relevant_filter(Course.objects.all())
+	'''Only months with relevant courses are listed'''
 	d = {
 		"Dec": "Грудень", "Jan": "Січень", "Feb": "Лютий", 
 		"Mar": "Березень", "Apr": "Квітень", "May": "Травень", 
@@ -25,8 +24,8 @@ def months_list():
 		"Sep": "Вересень", "Oct": "Жовтень", "Nov": "Листопад", 
 	}
 	months = []
-	for course in courses:
-		if not isinstance(course.start, str):
+	for course in Course.objects.all():
+		if timezone.now() < course.end:
 			month = re.search(r'\w+\s+(\w+)\s+\w+', course.start.ctime()).group(1)
 			month = (d[month], month)
 			if month not in months: months.append(month)
@@ -55,9 +54,16 @@ def pagination(request, objs, objs_on_page):
 		'next_url': next_url
 	}
 
-def what_page_on_paginator(request, objs_on_page, course_id):
+def what_page_on_paginator(request, objs_on_page, course_id, archived=False):
+	courses = Course.objects.all()
+	relevant_courses = relevant_filter(courses)
+	if archived:
+		courses = [course for course in courses if course not in relevant_courses]
+	else:
+		courses = relevant_courses
+	
 	pages, page, count = {}, 1, 0
-	for course in Course.objects.all():
+	for course in courses:
 		if count == objs_on_page:
 			page += 1; count = 0
 		pages[course] = page; count += 1
@@ -70,7 +76,11 @@ def create_edit_course(request, action='create', course_id=None):
 	if action == 'edit':
 		course = get_object_or_404(Course, id=course_id)
 	if request.method == 'POST':
-		form = CourseCreateEditForm(request.POST, request.FILES)
+		if action == 'edit':
+			form = CourseCreateEditForm(request.POST, request.FILES, 
+										instance=course)
+		else:
+			form = CourseCreateEditForm(request.POST, request.FILES)
 		if form.is_valid():
 			course_obj = form.save()
 			return redirect('course_detail_url', course_obj.id)

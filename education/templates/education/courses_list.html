@@ -5,15 +5,19 @@
 		<button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 			Фільтр
 		</button>
-
 		<div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
 			<a class="dropdown-item" href="{% url 'courses_list_url' %}">Всі</a>
 			{% for month in months %}
-				<a class="dropdown-item" href="{% url 'courses_filter_url' month.1 %}">{{month.0}}</a>
+				<a class="dropdown-item" href="{% url 'courses_filter_by_month_url' month.1 %}">{{month.0}}</a>
 			{% endfor %}
 			<a class="dropdown-item" href="{% url 'courses_archive_url' %}" id="archive">Архів</a>
 		</div>
 	</div>
+	<div align="center" class='period_filter'>
+		<a href="{% url 'courses_filter_by_period_url' 'week' %}">Тиждень |</a>
+		<a href="{% url 'courses_filter_by_period_url' 'month' %}">Місяць |</a>
+		<a href="{% url 'courses_filter_by_period_url' 'year' %}">Рік</a>
+	</div>	
 {% endblock %}
 
 {% block catalog %}
@@ -22,15 +26,10 @@
 
 		{% for course in page %}
 			<div class="card text-black bg-light" style="max-width: 18rem;">
-				{% if course.image %}
-					<img class="card-img-top" src="{{course.image.url}}">
-				{% else %}
-					<img class="card-img-top" src="../../media/images/you_course.png">
-				{% endif %}
-
+				<img class="card-img-top" src="{{course.image.url}}">
 				{% if user.is_authenticated %}
 					<div  class='card-header'>
-						<a href="{% url 'course_edit_url' course.id %}" class="alert alert-primary">редагувати</a>
+						<a href="{% url 'course_create_edit_url' course.id %}" class="alert alert-primary">редагувати</a>
 						<a href="{% url 'course_delete_url' course.id %}" class="alert alert-danger">видалити</a>
 					</div>
 				{% endif %}

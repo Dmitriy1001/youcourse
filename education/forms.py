@@ -2,7 +2,7 @@ from django import forms
 from .models import Course
 
 from bootstrap_datepicker_plus import *
-from django_summernote.widgets import SummernoteWidget, SummernoteInplaceWidget
+from django_summernote.widgets import SummernoteWidget
 
 
 class CourseCreateEditForm(forms.ModelForm):
@@ -17,5 +17,5 @@ class CourseCreateEditForm(forms.ModelForm):
 			'text': SummernoteWidget(attrs={'class': 'form-control'}),
 			'lectures_number': forms.NumberInput(attrs={'class': 'form-control'}),
 			'start': DateTimePickerInput(format='%Y-%m-%d %H:%M'),
-			'end': DatePickerInput(format='%Y-%m-%d'),
+			'end': DateTimePickerInput(format='%Y-%m-%d %H:%M'),
 		}
