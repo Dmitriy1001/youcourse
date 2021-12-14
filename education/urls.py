@@ -1,15 +1,15 @@
 from django.urls import path
 
-from .views import *
+from . import views
 
 
 urlpatterns = [
-	path('', courses_list, name='courses_list_url'),
-	path('archive/', courses_archive, name='courses_archive_url'),
-	path('create/', course_create, name='course_create_edit_url'),
-	path('<int:course_id>/', course_detail, name='course_detail_url'),
-	path('<int:course_id>/edit/', course_edit, name='course_create_edit_url'),
-	path('<int:course_id>/delete/', course_delete, name='course_delete_url'),
-	path('<str:period>/', courses_filter_by_period, name='courses_filter_by_period_url'),
-	path('month/<str:month_name>/', courses_filter_by_month, name='courses_filter_by_month_url'),
+    path('', views.courses_list, name='courses_list_url'),
+    path('archive/', views.courses_archive, name='courses_archive_url'),
+    path('create/', views.course_create, name='course_create_edit_url'),
+    path('<int:course_id>/', views.course_detail, name='course_detail_url'),
+    path('<int:course_id>/edit/', views.course_edit, name='course_create_edit_url'),
+    path('<int:course_id>/delete/', views.course_delete, name='course_delete_url'),
+    path('<str:period>/', views.courses_filter_by_period, name='courses_filter_by_period_url'),
+    path('month/<str:month_name>/', views.courses_filter_by_month, name='courses_filter_by_month_url'),
 ]
