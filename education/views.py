@@ -1,11 +1,12 @@
-from django.shortcuts import render, get_object_or_404, redirect
-from django.db.models import Q
 from django.contrib.auth.decorators import login_required
+from django.db.models import Q
+from django.http import Http404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.utils import timezone
 
-from .models import Course
 from . import utils
-# Create your views here.
+from .models import Course
+
 
 def courses_list(request):
 	search = request.GET.get('search', '')
@@ -16,30 +17,41 @@ def courses_list(request):
 	context = utils.pagination(request, utils.relevant_filter(courses), 6)
 	return render(request, 'education/courses_list.html', context)
 
-def courses_filter_by_month(request, month):
-	courses = [course for course in Course.objects.all()\
-			   if month in course.start.ctime()]
+def courses_filter_by_month(request, month_name):
+	months = {
+		"Dec": 12, "Jan": 1, "Feb": 2,
+		"Mar": 3, "Apr": 4, "May": 5,
+		"Jun": 6, "Jul": 7, "Aug": 8,
+		"Sep": 9, "Oct": 10, "Nov": 10,
+	}
+	try:
+		month_number = months[month_name]
+	except KeyError:
+		raise Http404('Такого місяця не існує')
+	courses = Course.objects.filter(start__month=month_number)
 	context = utils.pagination(request, utils.relevant_filter(courses), 6)
 	return render(request, 'education/courses_list.html', context)
 
 def courses_filter_by_period(request, period):
 	courses = Course.objects.all()
-	d = {
-		'year': filter(lambda x: x.start.year==timezone.now().year, courses),
-		'month': filter(lambda x: x.start.month==timezone.now().month, courses),
+	periods = {
+		'year': filter(lambda x: x.start.year == timezone.now().year, courses),
+		'month': filter(lambda x: x.start.month == timezone.now().month, courses),
 		'week': filter(
-				lambda x: x.start.isocalendar()[1]==timezone.now().isocalendar()[1], 
-				courses)
+				lambda x: x.start.isocalendar()[1] == timezone.now().isocalendar()[1],
+				courses,
+		)
 	}
-	courses = list(d[period])
+	try:
+		courses = list(periods[period])
+	except KeyError:
+		raise Http404
 	context = utils.pagination(request, utils.relevant_filter(courses), 6)
 	return render(request, 'education/courses_list.html', context)
 
 
 def courses_archive(request):
-	courses = Course.objects.order_by('-start')
-	relevant_courses = utils.relevant_filter(courses)
-	courses = [course for course in courses if course not in relevant_courses]
+	courses = Course.objects.filter(end__lt=timezone.now()).order_by('-start')
 	context = utils.pagination(request, courses, 6)
 	return render(request, 'education/courses_list.html', context)
 
@@ -48,13 +60,16 @@ def course_detail(request, course_id):
 	course = get_object_or_404(Course, id=course_id)
 	return render(request, 'education/course_detail.html', {'course': course})
 
+
 @login_required
 def course_create(request):
 	return utils.create_edit_course(request, 'create')
 
+
 @login_required
 def course_edit(request, course_id):
 	return utils.create_edit_course(request, 'edit', course_id)
+
 
 @login_required
 def course_delete(request, course_id):
@@ -71,6 +86,6 @@ def course_delete(request, course_id):
 	return render(request, 'education/course_delete.html', {'course': course})
 
 
-	 
+
 
 									

@@ -1,10 +1,12 @@
-from django.shortcuts import render, get_object_or_404, redirect
-from django.core.paginator import Paginator
-from django.utils import timezone
 import re
 
-from .models import Course
+from django.core.paginator import Paginator
+from django.shortcuts import render, get_object_or_404, redirect
+from django.utils import timezone
+
 from .forms import CourseCreateEditForm
+from .models import Course
+
 
 def relevant_filter(courses):
 	for course in courses:
@@ -12,12 +14,12 @@ def relevant_filter(courses):
 			course.start = 'Курс розпочався'
 		elif timezone.now() > course.end:
 			course.start = 'Курс завершено'
-	courses = [course for course in courses if course.start != 'Курс завершено']		
-	return courses
+	return list(filter(lambda course: course.start != 'Курс завершено', courses))
+
 
 def months_list():
 	'''Only months with relevant courses are listed'''
-	d = {
+	eng_ua = {
 		"Dec": "Грудень", "Jan": "Січень", "Feb": "Лютий", 
 		"Mar": "Березень", "Apr": "Квітень", "May": "Травень", 
 		"Jun": "Червень", "Jul": "Липень", "Aug": "Серпень", 
@@ -27,9 +29,11 @@ def months_list():
 	for course in Course.objects.all():
 		if timezone.now() < course.end:
 			month = re.search(r'\w+\s+(\w+)\s+\w+', course.start.ctime()).group(1)
-			month = (d[month], month)
-			if month not in months: months.append(month)
+			month = (eng_ua[month], month)
+			if month not in months:
+				months.append(month)
 	return months
+
 
 def pagination(request, objs, objs_on_page):
 	paginator = Paginator(objs, objs_on_page)
@@ -54,21 +58,23 @@ def pagination(request, objs, objs_on_page):
 		'next_url': next_url
 	}
 
+
 def what_page_on_paginator(request, objs_on_page, course_id, archived=False):
-	courses = Course.objects.all()
-	relevant_courses = relevant_filter(courses)
 	if archived:
-		courses = [course for course in courses if course not in relevant_courses]
+		courses = Course.objects.filter(end__lt=timezone.now())
 	else:
-		courses = relevant_courses
+		courses = Course.objects.filter(end__gt=timezone.now())
 	
 	pages, page, count = {}, 1, 0
 	for course in courses:
 		if count == objs_on_page:
-			page += 1; count = 0
-		pages[course] = page; count += 1
+			page += 1
+			count = 0
+		pages[course] = page
+		count += 1
 	course = get_object_or_404(Course, id=course_id)
 	return pages[course]
+
 
 # mixins
 
@@ -77,8 +83,10 @@ def create_edit_course(request, action='create', course_id=None):
 		course = get_object_or_404(Course, id=course_id)
 	if request.method == 'POST':
 		if action == 'edit':
-			form = CourseCreateEditForm(request.POST, request.FILES, 
-										instance=course)
+			form = CourseCreateEditForm(
+				request.POST, request.FILES,
+				instance=course,
+			)
 		else:
 			form = CourseCreateEditForm(request.POST, request.FILES)
 		if form.is_valid():

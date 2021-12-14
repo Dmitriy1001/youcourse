@@ -1,7 +1,8 @@
-from django.db import models
-import lorem
 from random import randint
-# Create your models here.
+
+import lorem
+from django.db import models
+
 
 class Course(models.Model):
 	name = models.CharField(max_length=100, blank=True, verbose_name='Назва')

@@ -1,15 +1,22 @@
-from django import forms 
-from .models import Course
-
 from bootstrap_datepicker_plus import *
+from django import forms
 from django_summernote.widgets import SummernoteWidget
+
+from .models import Course
 
 
 class CourseCreateEditForm(forms.ModelForm):
 	class Meta:
 		model = Course
-		fields = ('name', 'image', 'annotation', 'text', 'lectures_number',
-				  'start', 'end')
+		fields = (
+			'name',
+			'image',
+			'annotation',
+			'text',
+			'lectures_number',
+			'start',
+			'end',
+		)
 		widgets = {
 			'name': forms.TextInput(attrs={'class': 'form-control'}),
 			'image': forms.ClearableFileInput(attrs={'class': 'form-control-file'}),
